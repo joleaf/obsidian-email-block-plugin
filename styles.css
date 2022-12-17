@@ -1,0 +1,41 @@
+/* Styles */
+
+.email-block {
+    display: grid;
+    grid-template-columns: 1fr 8fr;
+    row-gap: 5px;
+    border: 1px solid gray;
+    padding: 4px;
+}
+
+.email-block-info {
+    font-style: italic;
+    font-size: 80%;
+    align-self: center;
+}
+
+.email-block-info-value {
+    font-weight: bold;
+    font-size: 90%;
+    align-self: center;
+}
+
+.email-block-body {
+    grid-column-start: 1;
+    grid-column-end: span 2;
+    border-left: 1px gray solid;
+    padding-left: 5px;
+}
+
+.email-block-body-line {
+
+}
+
+.email-block-mailto {
+    grid-column-start: 1;
+    grid-column-end: span 2;
+}
+
+.email-block-error {
+    color: red !important;
+}
