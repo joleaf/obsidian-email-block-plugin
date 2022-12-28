@@ -1,5 +1,4 @@
-import {Plugin} from "obsidian";
-import YAML from 'yaml'
+import {Plugin, parseYaml} from "obsidian";
 
 interface MailBlockParameters {
     to: string | undefined;
@@ -66,7 +65,7 @@ export default class MailBlockPlugin extends Plugin {
             jsonString = jsonString.replace("]]", ']]"');
         }
 
-        const parameters: MailBlockParameters = YAML.parse(jsonString);
+        const parameters: MailBlockParameters = parseYaml(jsonString);
 
         parameters.to = this.fixAddress(parameters.to)
         parameters.cc = this.fixAddress(parameters.cc)
