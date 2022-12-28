@@ -38,7 +38,7 @@ You can customize the view with the following parameters:
 |------------|--------------------------------------------------------------------|----------------------------|
 | to         | The main receiver of the mail. Multiple receiver seperated by ",". | String value               |
 | cc         | The cc receiver of the mail. Multiple receiver seperated by ",".   | String value               |
-| cc         | The bcc receiver of the mail. Multiple receiver seperated by ",".  | String value               |
+| bcc        | The bcc receiver of the mail. Multiple receiver seperated by ",".  | String value               |
 | subject    | The subject of the email.                                          | String value               |
 | body       | The body of the email.                                             | String value               |
 | showmailto | Show the "mailto" link after the mail body.                        | true/false (Default: true) |
