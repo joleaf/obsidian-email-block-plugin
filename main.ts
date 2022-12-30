@@ -1,4 +1,4 @@
-import {Plugin, parseYaml} from "obsidian";
+import {Plugin, parseYaml, MarkdownRenderer, Component} from "obsidian";
 
 interface MailBlockParameters {
     to: string | undefined;
@@ -43,12 +43,12 @@ export default class MailBlockPlugin extends Plugin {
                 rootEl.createEl("div", {cls: "email-block-info", text: "Subject:"});
                 rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
-                this.renderBody(bodyContent, parameters.body);
+                await this.renderBody(bodyContent, parameters.body);
                 const data = "mailto:" + this.encodeToHtml(parameters.to) +
                     "?subject=" + this.encodeToHtml(parameters.subject) +
                     "&cc=" + this.encodeToHtml(parameters.cc) +
                     "&bcc=" + this.encodeToHtml(parameters.bcc) +
-                    "&body=" + this.encodeToHtml(parameters.body);
+                    "&body=" + this.encodeToHtml(bodyContent.innerText);
                 if (parameters.showmailto) {
                     rootEl.createEl("a", {href: data, text: "Mailto"});
                 }
@@ -82,14 +82,6 @@ export default class MailBlockPlugin extends Plugin {
         //Transform internal Link to external
         if (parameters.body === undefined) {
             parameters.body = "";
-        } else if (parameters.body.startsWith("[[")) {
-            parameters.body = parameters.body.substring(2, parameters.body.length - 2);
-            // @ts-ignore
-            parameters.url = this.app.metadataCache.getFirstLinkpathDest(
-                parameters.body,
-                ""
-            ).path;
-            // TODO: for future version: transform content to html!
         }
 
         return parameters;
@@ -107,14 +99,28 @@ export default class MailBlockPlugin extends Plugin {
         return address.split(",").join(", ");
     }
 
-    private renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined) {
+    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined) {
         if (bodyContent === undefined) {
             return;
         }
-        let lines = bodyContent.split("\n");
-        lines.forEach(line => {
-            bodyContentEl.createEl("div", {cls: "email-block-body-line", text: line});
-        })
+        // render a markdown file
+        if (bodyContent.startsWith("[[")) {
+            bodyContent = bodyContent.substring(2, bodyContent.length - 2);
+
+            const mdFile = this.app.metadataCache.getFirstLinkpathDest(
+                bodyContent,
+                ""
+            );
+            if (mdFile != null) {
+                let mdContent = await this.app.vault.read(mdFile);
+                await MarkdownRenderer.renderMarkdown(mdContent, bodyContentEl, mdFile.path, new Component());
+            }
+        } else { // Render line by line as plain text
+            let lines = bodyContent.split("\n");
+            lines.forEach(line => {
+                bodyContentEl.createEl("div", {cls: "email-block-body-line", text: line});
+            })
+        }
     }
 
     private encodeToHtml(rawStr: string | undefined) {
