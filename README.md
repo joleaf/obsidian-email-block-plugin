@@ -58,6 +58,9 @@ x) Note that no formatting is supported (only new lines) ([reason](https://stack
 
 ![Example](example/email-block-plugin.gif)
 
+## Future features
+- Template variables in body + subject
+
 ## How to dev
 
 1. Clone this repo into the plugin folder of a (non-productive) vault (`.obsidian/plugins/`)
