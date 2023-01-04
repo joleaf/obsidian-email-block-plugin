@@ -1,6 +1,6 @@
 {
   "name": "email-block-plugin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "This plugin renders an email code block.",
   "main": "main.js",
   "scripts": {

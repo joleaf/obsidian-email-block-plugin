@@ -2,19 +2,25 @@
 
 All changes to this plugin are listed here.
 
-## 0.2.0 (30.12.2022)
+## 0.3.0 (2023-01-04)
+
+### New
+
+- Add placeholder variables
+
+## 0.2.0 (2022-12-30)
 
 ### New
 
 - A note can be used as body content using an internal link.
 
-## 0.1.1 (28.12.2022)
+## 0.1.1 (2022-12-28)
 
 ### Changed
 
 - Use obsidian parseYaml
 
-## 0.1.0 (17.12.2022)
+## 0.1.0 (2022-12-17)
 
 ### Added
 

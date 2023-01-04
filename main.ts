@@ -7,6 +7,7 @@ interface MailBlockParameters {
     subject: string | undefined;
     body: string | undefined; // Future version: can be a note, which will be formatted as html for the body
     showmailto: boolean | undefined;
+    variables: { [name: string]: string | undefined }
 }
 
 export default class MailBlockPlugin extends Plugin {
@@ -43,7 +44,7 @@ export default class MailBlockPlugin extends Plugin {
                 rootEl.createEl("div", {cls: "email-block-info", text: "Subject:"});
                 rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
-                await this.renderBody(bodyContent, parameters.body);
+                await this.renderBody(bodyContent, parameters.body, parameters.variables);
                 const data = "mailto:" + this.encodeToHtml(parameters.to) +
                     "?subject=" + this.encodeToHtml(parameters.subject) +
                     "&cc=" + this.encodeToHtml(parameters.cc) +
@@ -79,11 +80,21 @@ export default class MailBlockPlugin extends Plugin {
             parameters.showmailto = true;
         }
 
-        //Transform internal Link to external
         if (parameters.body === undefined) {
             parameters.body = "";
         }
 
+        // Variables
+        if (parameters.variables === undefined) {
+            parameters.variables = {};
+        }
+        parameters.variables['filename'] = this.app.workspace.getActiveFile()?.basename
+        const frontmatterData = this.app.metadataCache.getFileCache(app.workspace.getActiveFile()!)?.frontmatter
+        if (frontmatterData != undefined) {
+            for (const [key, value] of Object.entries(frontmatterData)) {
+                parameters.variables[key] = value.toString();
+            }
+        }
         return parameters;
     }
 
@@ -99,7 +110,7 @@ export default class MailBlockPlugin extends Plugin {
         return address.split(",").join(", ");
     }
 
-    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined) {
+    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined, variables: { [name: string]: string | undefined }) {
         if (bodyContent === undefined) {
             return;
         }
@@ -113,9 +124,19 @@ export default class MailBlockPlugin extends Plugin {
             );
             if (mdFile != null) {
                 let mdContent = await this.app.vault.read(mdFile);
+                for (const [variable, value] of Object.entries(variables)) {
+                    if (value != undefined) {
+                        mdContent = mdContent.replace("{{" + variable + "}}", value);
+                    }
+                }
                 await MarkdownRenderer.renderMarkdown(mdContent, bodyContentEl, mdFile.path, new Component());
             }
         } else { // Render line by line as plain text
+            for (const [variable, value] of Object.entries(variables)) {
+                if (value != undefined) {
+                    bodyContent = bodyContent?.replace("{{" + variable + "}}", value);
+                }
+            }
             let lines = bodyContent.split("\n");
             lines.forEach(line => {
                 bodyContentEl.createEl("div", {cls: "email-block-body-line", text: line});

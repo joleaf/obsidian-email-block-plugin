@@ -21,6 +21,7 @@ This plugin lets you plan small emails inside your [Obsidian](https://www.obsidi
 Add the "email" code block into your note:
 
 ... with plain text as body content:
+
 ````
 ```email
 to: info@randommail.com
@@ -32,13 +33,20 @@ body: "Hey info,
 ````
 
 ... with a referenced note as body content:
+
 ````
 ```email
 to: info@randommail.com
 subject: My Subject
 body: [[MyMail4711]]
+variables:
+  myvar: TestVar
 ```
 ````
+
+You can use the `variables` parameter to replace placeholders in your body text with the variable values.
+To include a variable in the body text just add a placeholder `{{myvar}}`.
+Variables from frontmatter data can be used as well.
 
 ### Parameter
 
@@ -52,13 +60,17 @@ You can customize the view with the following parameters:
 | subject    | The subject of the email.                                              | String value               |
 | body       | The body of the email. Plain text or a link to a \[\[NoteFile\]\] (x). | String value               |
 | showmailto | Show the "mailto" link after the mail body.                            | true/false (Default: true) |
+| variables  | A map of placeholder variables.                                        | YAML Object                | - |
 
-x) Note that no formatting is supported (only new lines) ([reason](https://stackoverflow.com/questions/5620324/mailto-link-with-html-body)).
+x) Note that no formatting is supported (only new
+lines) ([reason](https://stackoverflow.com/questions/5620324/mailto-link-with-html-body)).
+
 ### Example
 
 ![Example](example/email-block-plugin.gif)
 
 ## Future features
+
 - Template variables in body + subject
 
 ## How to dev
