@@ -69,10 +69,6 @@ lines) ([reason](https://stackoverflow.com/questions/5620324/mailto-link-with-ht
 
 ![Example](example/email-block-plugin.gif)
 
-## Future features
-
-- Template variables in body + subject
-
 ## How to dev
 
 1. Clone this repo into the plugin folder of a (non-productive) vault (`.obsidian/plugins/`)
