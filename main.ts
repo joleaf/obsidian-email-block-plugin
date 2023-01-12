@@ -1,4 +1,4 @@
-import {Plugin, parseYaml, MarkdownRenderer, Component} from "obsidian";
+import {Plugin, parseYaml, MarkdownRenderer, Component, MarkdownPostProcessorContext} from "obsidian";
 
 interface MailBlockParameters {
     to: string | undefined;
@@ -19,7 +19,7 @@ export default class MailBlockPlugin extends Plugin {
             // Get Parameters
             let parameters: MailBlockParameters | null = null;
             try {
-                parameters = this.readParameters(src);
+                parameters = this.readParameters(src, ctx);
             } catch (e) {
                 el.createEl("h3", {text: "Email parameters invalid: \n" + e.message});
                 return;
@@ -44,7 +44,7 @@ export default class MailBlockPlugin extends Plugin {
                 rootEl.createEl("div", {cls: "email-block-info", text: "Subject:"});
                 rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
-                await this.renderBody(bodyContent, parameters.body, parameters.variables);
+                await this.renderBody(bodyContent, parameters.body, parameters.variables, ctx);
                 const data = "mailto:" + this.encodeToHtml(parameters.to) +
                     "?subject=" + this.encodeToHtml(parameters.subject) +
                     "&cc=" + this.encodeToHtml(parameters.cc) +
@@ -60,7 +60,7 @@ export default class MailBlockPlugin extends Plugin {
     }
 
 
-    private readParameters(jsonString: string) {
+    private readParameters(jsonString: string, ctx: MarkdownPostProcessorContext) {
         if (jsonString.contains("[[") && !jsonString.contains('"[[')) {
             jsonString = jsonString.replace("[[", '"[[');
             jsonString = jsonString.replace("]]", ']]"');
@@ -88,11 +88,18 @@ export default class MailBlockPlugin extends Plugin {
         if (parameters.variables === undefined) {
             parameters.variables = {};
         }
-        parameters.variables['filename'] = this.app.workspace.getActiveFile()?.basename
-        const frontmatterData = this.app.metadataCache.getFileCache(app.workspace.getActiveFile()!)?.frontmatter
-        if (frontmatterData != undefined) {
-            for (const [key, value] of Object.entries(frontmatterData)) {
-                parameters.variables[key] = value.toString();
+        const sourceFile = this.app.metadataCache.getFirstLinkpathDest(
+            ctx.sourcePath,
+            ctx.sourcePath,
+        );
+        if (sourceFile != null) {
+            const sourceCache = this.app.metadataCache.getFileCache(sourceFile);
+            if (sourceCache != null) {
+                if (sourceCache.frontmatter != undefined) {
+                    for (const [key, value] of Object.entries(sourceCache.frontmatter)) {
+                        parameters.variables[key] = value.toString();
+                    }
+                }
             }
         }
         return parameters;
@@ -110,7 +117,7 @@ export default class MailBlockPlugin extends Plugin {
         return address.split(",").join(", ");
     }
 
-    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined, variables: { [name: string]: string | undefined }) {
+    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined, variables: { [name: string]: string | undefined }, ctx: MarkdownPostProcessorContext) {
         if (bodyContent === undefined) {
             return;
         }
@@ -120,7 +127,7 @@ export default class MailBlockPlugin extends Plugin {
 
             const mdFile = this.app.metadataCache.getFirstLinkpathDest(
                 bodyContent,
-                ""
+                ctx.sourcePath
             );
             if (mdFile != null) {
                 let mdContent = await this.app.vault.read(mdFile);

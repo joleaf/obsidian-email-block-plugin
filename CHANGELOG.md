@@ -2,6 +2,12 @@
 
 All changes to this plugin are listed here.
 
+## 0.3.1 (2023-01-12)
+
+### Fixed
+- Use `ctx.sourcePath` for finding the correct frontmatter data of the file
+- Use `ctx.sourcePath` in `getFirstLinkpathDest` to make sure finding the correct linked file
+
 ## 0.3.0 (2023-01-04)
 
 ### New
