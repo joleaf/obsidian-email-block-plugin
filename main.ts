@@ -90,7 +90,7 @@ export default class MailBlockPlugin extends Plugin {
         }
         const sourceFile = this.app.metadataCache.getFirstLinkpathDest(
             ctx.sourcePath,
-            ctx.sourcePath,
+            "",
         );
         if (sourceFile != null) {
             const sourceCache = this.app.metadataCache.getFileCache(sourceFile);
