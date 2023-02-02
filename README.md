@@ -4,7 +4,7 @@ This plugin lets you plan small emails inside your [Obsidian](https://www.obsidi
 
 ## Install ..
 
-### .. automatically in Obsidian (not yet)
+### .. automatically in Obsidian
 
 1. Go to **Community Plugins** in your Obsidian Settings and **disable** Safe Mode
 2. Click on **Browse** and search for "Email Block"
