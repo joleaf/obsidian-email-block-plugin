@@ -45,11 +45,12 @@ export default class MailBlockPlugin extends Plugin {
                 rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
                 await this.renderBody(bodyContent, parameters.body, parameters.variables, ctx);
+                console.log(bodyContent.innerText.length);
                 const data = "mailto:" + this.encodeToHtml(parameters.to) +
                     "?subject=" + this.encodeToHtml(parameters.subject) +
-                    "&cc=" + this.encodeToHtml(parameters.cc) +
-                    "&bcc=" + this.encodeToHtml(parameters.bcc) +
-                    "&body=" + this.encodeToHtml(bodyContent.innerText);
+                    (parameters.cc !== undefined ? "&cc=" + this.encodeToHtml(parameters.cc) : "") +
+                    (parameters.bcc !== undefined ? "&bcc=" + this.encodeToHtml(parameters.bcc) : "") +
+                    (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText) : "");
                 if (parameters.showmailto) {
                     rootEl.createEl("a", {href: data, text: "Mailto"});
                 }
