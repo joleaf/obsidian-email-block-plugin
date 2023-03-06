@@ -1,6 +1,11 @@
 # Changelog
 
 All changes to this plugin are listed here.
+## 0.3.3 (2023-03-06)
+
+### Fixed
+
+- #2 only add `&cc`, `&bcc` or `&body` if a value is provided
 
 ## 0.3.2 (2023-01-13)
 
