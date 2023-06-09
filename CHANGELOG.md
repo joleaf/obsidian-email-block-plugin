@@ -1,6 +1,13 @@
 # Changelog
 
 All changes to this plugin are listed here.
+
+## 0.4.0 (2023-06-09)
+
+### New
+
+- #4 Body can be set after the yaml, seperated by a "---" line
+
 ## 0.3.3 (2023-03-06)
 
 ### Fixed

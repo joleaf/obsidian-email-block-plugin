@@ -25,7 +25,7 @@ export default class MailBlockPlugin extends Plugin {
                 return;
             }
 
-            console.log("Render the Email");
+            //console.log("Render the Email");
             try {
                 const rootEl = el.createEl("div", {cls: "email-block"});
                 //rootEl.createEl("a", {text: "Send", href: "mailto:" + parameters.to + "#subject" + parameters.subject})
@@ -45,7 +45,6 @@ export default class MailBlockPlugin extends Plugin {
                 rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
                 await this.renderBody(bodyContent, parameters.body, parameters.variables, ctx);
-                console.log(bodyContent.innerText.length);
                 const data = "mailto:" + this.encodeToHtml(parameters.to) +
                     "?subject=" + this.encodeToHtml(parameters.subject) +
                     (parameters.cc !== undefined ? "&cc=" + this.encodeToHtml(parameters.cc) : "") +
@@ -61,20 +60,25 @@ export default class MailBlockPlugin extends Plugin {
     }
 
 
-    private readParameters(jsonString: string, ctx: MarkdownPostProcessorContext) {
-        if (jsonString.contains("[[") && !jsonString.contains('"[[')) {
-            jsonString = jsonString.replace("[[", '"[[');
-            jsonString = jsonString.replace("]]", ']]"');
+    private readParameters(yamlString: string, ctx: MarkdownPostProcessorContext) {
+        if (yamlString.contains("[[") && !yamlString.contains('"[[')) {
+            yamlString = yamlString.replace("[[", '"[[');
+            yamlString = yamlString.replace("]]", ']]"');
         }
+        let extraBody = "";
+        if (yamlString.contains("---")){
+            let data = yamlString.split("---");
+            yamlString = data[0];
+            extraBody = data[1];
+        }
+        const parameters: MailBlockParameters = parseYaml(yamlString);
 
-        const parameters: MailBlockParameters = parseYaml(jsonString);
-
-        parameters.to = this.fixAddress(parameters.to)
-        parameters.cc = this.fixAddress(parameters.cc)
-        parameters.bcc = this.fixAddress(parameters.bcc)
+        parameters.to = this.fixAddress(parameters.to);
+        parameters.cc = this.fixAddress(parameters.cc);
+        parameters.bcc = this.fixAddress(parameters.bcc);
 
         if (parameters.subject == undefined) {
-            parameters.subject = ""
+            parameters.subject = "";
         }
 
         if (parameters.showmailto == undefined) {
@@ -82,7 +86,7 @@ export default class MailBlockPlugin extends Plugin {
         }
 
         if (parameters.body === undefined) {
-            parameters.body = "";
+            parameters.body = extraBody;
         }
 
         // Variables
