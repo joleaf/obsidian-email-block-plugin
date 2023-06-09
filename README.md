@@ -48,6 +48,21 @@ You can use the `variables` parameter to replace placeholders in your body text 
 To include a variable in the body text just add a placeholder `{{myvar}}`.
 Variables from frontmatter data can be used as well.
 
+
+... with a body text after the yaml:
+
+````
+```email
+to: info@randommail.com
+subject: Hello World
+---
+Hi there,
+this is my new body
+Best!
+JB
+```
+````
+
 ### Parameter
 
 You can customize the view with the following parameters:
