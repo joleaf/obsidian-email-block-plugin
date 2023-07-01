@@ -2,6 +2,12 @@
 
 All changes to this plugin are listed here.
 
+## 0.5.0 (2023-07-01)
+
+### New
+
+- #8 Add a **from** parameter.
+
 ## 0.4.0 (2023-06-09)
 
 ### New

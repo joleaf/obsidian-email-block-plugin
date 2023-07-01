@@ -75,7 +75,8 @@ You can customize the view with the following parameters:
 | subject    | The subject of the email.                                              | String value               |
 | body       | The body of the email. Plain text or a link to a \[\[NoteFile\]\] (x). | String value               |
 | showmailto | Show the "mailto" link after the mail body.                            | true/false (Default: true) |
-| variables  | A map of placeholder variables.                                        | YAML Object                | - |
+| variables  | A map of placeholder variables.                                        | YAML Object                | 
+| from       | A from field (only for documentation).                                 | String value               | 
 
 x) Note that no formatting is supported (only new
 lines) ([reason](https://stackoverflow.com/questions/5620324/mailto-link-with-html-body)).

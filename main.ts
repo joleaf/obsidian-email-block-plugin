@@ -5,9 +5,10 @@ interface MailBlockParameters {
     cc: string | undefined;
     bcc: string | undefined;
     subject: string | undefined;
-    body: string | undefined; // Future version: can be a note, which will be formatted as html for the body
+    body: string | undefined; 
     showmailto: boolean | undefined;
     variables: { [name: string]: string | undefined }
+    from: string | undefined;
 }
 
 export default class MailBlockPlugin extends Plugin {
@@ -25,10 +26,13 @@ export default class MailBlockPlugin extends Plugin {
                 return;
             }
 
-            //console.log("Render the Email");
+            // console.log("Render the Email " + parameters);
             try {
                 const rootEl = el.createEl("div", {cls: "email-block"});
-                //rootEl.createEl("a", {text: "Send", href: "mailto:" + parameters.to + "#subject" + parameters.subject})
+                if (parameters.from !== undefined) {
+                    rootEl.createEl("div", {cls: "email-block-info", text: "From:"});
+                    rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.from)});
+                }
                 if (parameters.to !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "To:"});
                     rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.to)});
