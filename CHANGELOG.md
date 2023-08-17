@@ -2,6 +2,12 @@
 
 All changes to this plugin are listed here.
 
+## 0.6.0 (2023-08-17)
+
+### New
+
+- #7 Small UI improvements with new MailTo Button
+
 ## 0.5.0 (2023-07-01)
 
 ### New

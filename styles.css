@@ -2,10 +2,14 @@
 
 .email-block {
     display: grid;
-    grid-template-columns: 1fr 8fr;
-    row-gap: 5px;
-    border: 1px solid gray;
+    grid-template-columns: 1fr 6fr;
+    row-gap: 4px;
     padding: 4px;
+}
+
+.email-block-border {
+    border: 1px solid gray;
+    border-radius: 5px;
 }
 
 .email-block-info {
@@ -15,7 +19,6 @@
 }
 
 .email-block-info-value {
-    font-weight: bold;
     font-size: 90%;
     align-self: center;
 }
@@ -23,7 +26,7 @@
 .email-block-body {
     grid-column-start: 1;
     grid-column-end: span 2;
-    border-left: 1px gray solid;
+    border-left: 2px gray solid;
     padding-left: 5px;
 }
 
@@ -33,7 +36,9 @@
 
 .email-block-mailto {
     grid-column-start: 1;
+    grid-row-start: 1;
     grid-column-end: span 2;
+    --icon-size: 2rem;
 }
 
 .email-block-error {

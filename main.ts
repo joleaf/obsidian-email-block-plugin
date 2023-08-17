@@ -1,11 +1,11 @@
-import {Plugin, parseYaml, MarkdownRenderer, Component, MarkdownPostProcessorContext} from "obsidian";
+import {Plugin, parseYaml, MarkdownRenderer, Component, MarkdownPostProcessorContext, setIcon} from "obsidian";
 
 interface MailBlockParameters {
     to: string | undefined;
     cc: string | undefined;
     bcc: string | undefined;
     subject: string | undefined;
-    body: string | undefined; 
+    body: string | undefined;
     showmailto: boolean | undefined;
     variables: { [name: string]: string | undefined }
     from: string | undefined;
@@ -28,7 +28,9 @@ export default class MailBlockPlugin extends Plugin {
 
             // console.log("Render the Email " + parameters);
             try {
-                const rootEl = el.createEl("div", {cls: "email-block"});
+                const rootEl = el.createEl("div", {cls: "email-block email-block-border"});
+
+
                 if (parameters.from !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "From:"});
                     rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.from)});
@@ -49,14 +51,18 @@ export default class MailBlockPlugin extends Plugin {
                 rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
                 await this.renderBody(bodyContent, parameters.body, parameters.variables, ctx);
-                const data = "mailto:" + this.encodeToHtml(parameters.to) +
-                    "?subject=" + this.encodeToHtml(parameters.subject) +
-                    (parameters.cc !== undefined ? "&cc=" + this.encodeToHtml(parameters.cc) : "") +
-                    (parameters.bcc !== undefined ? "&bcc=" + this.encodeToHtml(parameters.bcc) : "") +
-                    (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText) : "");
                 if (parameters.showmailto) {
-                    rootEl.createEl("a", {href: data, text: "Mailto"});
+                    const data = "mailto:" + this.encodeToHtml(parameters.to) +
+                        "?subject=" + this.encodeToHtml(parameters.subject) +
+                        (parameters.cc !== undefined ? "&cc=" + this.encodeToHtml(parameters.cc) : "") +
+                        (parameters.bcc !== undefined ? "&bcc=" + this.encodeToHtml(parameters.bcc) : "") +
+                        (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText) : "");
+                    const mailToButton = rootEl
+                        .createEl("div", {cls: "email-block-mailto"})
+                        .createEl("a", {href: data, text: "Mailto"});
+                    setIcon(mailToButton, "mail");
                 }
+
             } catch (error) {
                 el.createEl("h3", {text: error});
             }
@@ -70,7 +76,7 @@ export default class MailBlockPlugin extends Plugin {
             yamlString = yamlString.replace("]]", ']]"');
         }
         let extraBody = "";
-        if (yamlString.contains("---")){
+        if (yamlString.contains("---")) {
             let data = yamlString.split("---");
             yamlString = data[0];
             extraBody = data[1];
@@ -164,8 +170,7 @@ export default class MailBlockPlugin extends Plugin {
         if (rawStr === undefined) {
             return "";
         }
-        let retStr = encodeURIComponent(rawStr);
-        return retStr;
+        return encodeURIComponent(rawStr);
     }
 
     onunload() {
