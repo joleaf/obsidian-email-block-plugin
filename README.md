@@ -46,7 +46,7 @@ variables:
 
 You can use the `variables` parameter to replace placeholders in your body text with the variable values.
 To include a variable in the body text just add a placeholder `{{myvar}}`.
-Variables from frontmatter data can be used as well.
+Variables from fontmatter data can be used as well.
 
 
 ... with a body text after the yaml:
