@@ -48,12 +48,14 @@ export default class MailBlockPlugin extends Plugin {
                     rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.bcc)});
                 }
                 rootEl.createEl("div", {cls: "email-block-info", text: "Subject:"});
-                rootEl.createEl("div", {cls: "email-block-info-value", text: parameters.subject});
+                const subjectContent = rootEl.createEl("div", {cls: "email-block-info-value"});
+                await this.renderBody(subjectContent, parameters.subject, parameters.variables, ctx);
+
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
                 await this.renderBody(bodyContent, parameters.body, parameters.variables, ctx);
                 if (parameters.showmailto) {
                     const data = "mailto:" + this.encodeToHtml(parameters.to) +
-                        "?subject=" + this.encodeToHtml(parameters.subject) +
+                        "?subject=" + this.encodeToHtml(subjectContent.innerText) +
                         (parameters.cc !== undefined ? "&cc=" + this.encodeToHtml(parameters.cc) : "") +
                         (parameters.bcc !== undefined ? "&bcc=" + this.encodeToHtml(parameters.bcc) : "") +
                         (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText) : "");
@@ -81,6 +83,13 @@ export default class MailBlockPlugin extends Plugin {
             yamlString = data[0];
             extraBody = data[1];
         }
+
+        //Necessary to do not parse {{value}} into on object by parseYaml
+        if (yamlString.contains("{{") && !yamlString.contains('"{{')) {
+            yamlString = yamlString.replace("{{", '"{{');
+            yamlString = yamlString.replace("}}", '}}"');
+        }
+
         const parameters: MailBlockParameters = parseYaml(yamlString);
 
         parameters.to = this.fixAddress(parameters.to);
@@ -89,6 +98,10 @@ export default class MailBlockPlugin extends Plugin {
 
         if (parameters.subject == undefined) {
             parameters.subject = "";
+        } else {
+            //remove double quotes (it has been utilized after parsing)
+            parameters.subject = parameters.subject.replace('"{{', "{{");
+            parameters.subject = parameters.subject.replace('}}"', "}}");
         }
 
         if (parameters.showmailto == undefined) {
@@ -99,7 +112,7 @@ export default class MailBlockPlugin extends Plugin {
             parameters.body = extraBody;
         }
 
-        // Variables
+// Variables
         if (parameters.variables === undefined) {
             parameters.variables = {};
         }
@@ -132,11 +145,13 @@ export default class MailBlockPlugin extends Plugin {
         return address.split(",").join(", ");
     }
 
-    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined, variables: { [name: string]: string | undefined }, ctx: MarkdownPostProcessorContext) {
+    private async renderBody(bodyContentEl: HTMLElement, bodyContent: string | undefined, variables: {
+        [name: string]: string | undefined
+    }, ctx: MarkdownPostProcessorContext) {
         if (bodyContent === undefined) {
             return;
         }
-        // render a markdown file
+// render a markdown file
         if (bodyContent.startsWith("[[")) {
             bodyContent = bodyContent.substring(2, bodyContent.length - 2);
 
