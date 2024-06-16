@@ -119,7 +119,7 @@ export default class MailBlockPlugin extends Plugin {
             parameters.body = extraBody;
         }
 
-// Variables
+        // Variables
         if (parameters.variables === undefined) {
             parameters.variables = {};
         }

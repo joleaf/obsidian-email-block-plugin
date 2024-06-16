@@ -2,6 +2,13 @@
 
 All changes to this plugin are listed here.
 
+## 1.0.0 (2024-06-16)
+
+### New
+
+- Use variables in all fields
+- #13 Use variables from the properties (only first level of properties)
+
 ## 0.6.0 (2023-08-17)
 
 ### New
@@ -30,7 +37,7 @@ All changes to this plugin are listed here.
 
 ### Fixed
 
-- Use `"""` for second parameter in `getFirstLinkpathDest` if absolute path  
+- Use `"""` for second parameter in `getFirstLinkpathDest` if absolute path
 
 ## 0.3.1 (2023-01-12)
 

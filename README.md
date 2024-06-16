@@ -48,7 +48,6 @@ You can use the `variables` parameter to replace placeholders in your body text 
 To include a variable in the body text just add a placeholder `{{myvar}}`.
 Variables from fontmatter data can be used as well.
 
-
 ... with a body text after the yaml:
 
 ````
@@ -64,6 +63,7 @@ JB
 ````
 
 ... you can use properties, like variables, on the subject or within the body:
+
 ````
 ```email
 to: info@randommail.com
@@ -80,19 +80,20 @@ FI
 
 You can customize the view with the following parameters:
 
-| Parameter  | Description                                                           | Values                     |
-|------------|-----------------------------------------------------------------------|----------------------------|
-| to         | The main receiver of the mail. Multiple receiver seperated by ",".    | String value               |
-| cc         | The cc receiver of the mail. Multiple receiver seperated by ",".      | String value               |
-| bcc        | The bcc receiver of the mail. Multiple receiver seperated by ",".     | String value               |
-| subject    | The subject of the email. Plain text or combined text with variables  | String value               |
-| body       | The body of the email. Plain text or a link to a \[\[NoteFile\]\] (x). | String value               |
-| showmailto | Show the "mailto" link after the mail body.                           | true/false (Default: true) |
-| variables  | A map of placeholder variables.                                       | YAML Object                | 
-| from       | A from field (only for documentation).                                | String value               | 
+| Parameter  | Description                                                            | Values                         | Required |
+|------------|------------------------------------------------------------------------|--------------------------------|----------|
+| to         | The main receiver of the mail. Multiple receiver seperated by ",".     | String / List of Strings       |          |
+| cc         | The cc receiver of the mail. Multiple receiver seperated by ",".       | String / List of Strings       |          |
+| bcc        | The bcc receiver of the mail. Multiple receiver seperated by ",".      | String value / List of Strings |          |
+| subject    | The subject of the email. Plain text or combined text with variables   | String value                   | x        |
+| body (1)   | The body of the email. Plain text or a link to a \[\[NoteFile\]\] (2). | String value                   | x        |
+| showmailto | Show the "mailto" link after the mail body.                            | true/false (Default: true)     |          |
+| variables  | A map of placeholder variables.                                        | YAML Object                    |          | 
+| from       | A from field (only for documentation).                                 | String value                   |          | 
 
-x) Note that no formatting is supported (only new
-lines) ([reason](https://stackoverflow.com/questions/5620324/mailto-link-with-html-body)).
+1) The body can be appended after the yaml with a "---" separation
+2) No formatting is supported (only new
+   lines) ([reason](https://stackoverflow.com/questions/5620324/mailto-link-with-html-body)).
 
 ### Example
 
