@@ -1,9 +1,9 @@
 import {Plugin, parseYaml, MarkdownRenderer, Component, MarkdownPostProcessorContext, setIcon} from "obsidian";
 
 interface MailBlockParameters {
-    to: string | undefined;
-    cc: string | undefined;
-    bcc: string | undefined;
+    to: [string] | string | undefined;
+    cc: [string] | string | undefined;
+    bcc: [string] | string | undefined;
     subject: string | undefined;
     body: string | undefined;
     showmailto: boolean | undefined;
@@ -30,34 +30,41 @@ export default class MailBlockPlugin extends Plugin {
             try {
                 const rootEl = el.createEl("div", {cls: "email-block email-block-border"});
 
-
+                let fromContent = undefined;
                 if (parameters.from !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "From:"});
-                    rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.from)});
+                    fromContent = this.replaceVariables(this.renderAddress(parameters.from), parameters.variables)
+                    rootEl.createEl("div", {cls: "email-block-info-value", text: fromContent});
                 }
+                let toContent = undefined;
                 if (parameters.to !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "To:"});
-                    rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.to)});
+                    toContent = this.replaceVariables(this.renderAddress(parameters.to), parameters.variables)
+                    rootEl.createEl("div", {cls: "email-block-info-value", text: toContent});
                 }
+                let ccContent = undefined;
                 if (parameters.cc !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "Cc:"});
-                    rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.cc)});
+                    ccContent = this.replaceVariables(this.renderAddress(parameters.cc), parameters.variables)
+                    rootEl.createEl("div", {cls: "email-block-info-value", text: ccContent});
                 }
+                let bccContent = undefined;
                 if (parameters.bcc !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "Bcc:"});
-                    rootEl.createEl("div", {cls: "email-block-info-value", text: this.renderAddress(parameters.bcc)});
+                    bccContent = this.replaceVariables(this.renderAddress(parameters.bcc), parameters.variables)
+                    rootEl.createEl("div", {cls: "email-block-info-value", text: bccContent});
                 }
                 rootEl.createEl("div", {cls: "email-block-info", text: "Subject:"});
-                const subjectContent = rootEl.createEl("div", {cls: "email-block-info-value"});
-                await this.renderBody(subjectContent, parameters.subject, parameters.variables, ctx);
+                const subjectContent = this.replaceVariables(parameters.subject, parameters.variables);
+                rootEl.createEl("div", {cls: "email-block-info-value", text: subjectContent});
 
                 const bodyContent = rootEl.createEl("div", {cls: "email-block-body"});
                 await this.renderBody(bodyContent, parameters.body, parameters.variables, ctx);
                 if (parameters.showmailto) {
-                    const data = "mailto:" + this.encodeToHtml(parameters.to) +
-                        "?subject=" + this.encodeToHtml(subjectContent.innerText) +
-                        (parameters.cc !== undefined ? "&cc=" + this.encodeToHtml(parameters.cc) : "") +
-                        (parameters.bcc !== undefined ? "&bcc=" + this.encodeToHtml(parameters.bcc) : "") +
+                    const data = "mailto:" + this.encodeToHtml(toContent) +
+                        "?subject=" + this.encodeToHtml(subjectContent) +
+                        (ccContent !== undefined ? "&cc=" + this.encodeToHtml(ccContent) : "") +
+                        (bccContent !== undefined ? "&bcc=" + this.encodeToHtml(bccContent) : "") +
                         (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText) : "");
                     const mailToButton = rootEl
                         .createEl("div", {cls: "email-block-mailto"})
@@ -133,15 +140,24 @@ export default class MailBlockPlugin extends Plugin {
         return parameters;
     }
 
-    private fixAddress(address: string | undefined) {
+    private fixAddress(address: [string] | string | undefined) {
         if (address === undefined) {
             return undefined;
         }
-        let fixedAddress = address.replace(/\s/g, "").replace(";", ",");
+        let fixedAddress: string = "";
+        if (Array.isArray(address)) {
+            fixedAddress = address.join(",");
+        } else {
+            fixedAddress = address;
+        }
+        fixedAddress = fixedAddress.replace(/\s/g, "").replace(";", ",");
         return fixedAddress;
     }
 
-    private renderAddress(address: string) {
+    private renderAddress(address: [string] | string) {
+        if (Array.isArray(address)) {
+            return address.join(", ")
+        }
         return address.split(",").join(", ");
     }
 
@@ -161,24 +177,29 @@ export default class MailBlockPlugin extends Plugin {
             );
             if (mdFile != null) {
                 let mdContent = await this.app.vault.read(mdFile);
-                for (const [variable, value] of Object.entries(variables)) {
-                    if (value != undefined) {
-                        mdContent = mdContent.replace("{{" + variable + "}}", value);
-                    }
-                }
+                mdContent = this.replaceVariables(mdContent, variables);
                 await MarkdownRenderer.renderMarkdown(mdContent, bodyContentEl, mdFile.path, new Component());
             }
         } else { // Render line by line as plain text
-            for (const [variable, value] of Object.entries(variables)) {
-                if (value != undefined) {
-                    bodyContent = bodyContent?.replace("{{" + variable + "}}", value);
-                }
-            }
+            bodyContent = this.replaceVariables(bodyContent, variables);
             let lines = bodyContent.split("\n");
             lines.forEach(line => {
                 bodyContentEl.createEl("div", {cls: "email-block-body-line", text: line});
             })
         }
+    }
+
+    private replaceVariables(content: string | undefined, variables: { [name: string]: string | undefined }): string {
+        if (content === undefined) {
+            return "";
+        }
+        let resultingContent = content;
+        for (const [variable, value] of Object.entries(variables)) {
+            if (value != undefined) {
+                resultingContent = resultingContent?.replace("{{" + variable + "}}", value);
+            }
+        }
+        return resultingContent;
     }
 
     private encodeToHtml(rawStr: string | undefined) {
