@@ -132,7 +132,9 @@ export default class MailBlockPlugin extends Plugin {
             if (sourceCache != null) {
                 if (sourceCache.frontmatter != undefined) {
                     for (const [key, value] of Object.entries(sourceCache.frontmatter)) {
-                        parameters.variables[key] = value.toString();
+                        if (value && typeof value.toString === 'function') {
+                            parameters.variables[key] = value.toString();
+                        }
                     }
                 }
             }
