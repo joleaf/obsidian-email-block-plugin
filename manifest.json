@@ -1,7 +1,7 @@
 {
 	"id": "email-block-plugin",
 	"name": "Email code block",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
 	"description": "This plugin renders an email code block.",
 	"author": "JoLeaf",
