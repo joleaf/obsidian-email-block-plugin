@@ -2,6 +2,11 @@
 
 All changes to this plugin are listed here.
 
+## 1.0.1 (2024-06-18)
+
+### Fixed
+- #14 No yaml field values without a "toString" method
+
 ## 1.0.0 (2024-06-16)
 
 ### New
