@@ -65,7 +65,7 @@ export default class MailBlockPlugin extends Plugin {
                         "?subject=" + this.encodeToHtml(subjectContent) +
                         (ccContent !== undefined ? "&cc=" + this.encodeToHtml(ccContent) : "") +
                         (bccContent !== undefined ? "&bcc=" + this.encodeToHtml(bccContent) : "") +
-                        (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText) : "");
+                        (bodyContent.innerText.length !== 0 ? "&body=" + this.encodeToHtml(bodyContent.innerText.replace(/\n\n/g, '\n')) : "");
                     const mailToButton = rootEl
                         .createEl("div", {cls: "email-block-mailto"})
                         .createEl("a", {href: data, text: "Mailto"});
@@ -85,8 +85,8 @@ export default class MailBlockPlugin extends Plugin {
             yamlString = yamlString.replace("]]", ']]"');
         }
         let extraBody = "";
-        if (yamlString.contains("---")) {
-            let data = yamlString.split("---");
+        if (yamlString.contains("---\n")) {
+            let data = yamlString.split("---\n");
             yamlString = data[0];
             extraBody = data[1];
         }
@@ -186,7 +186,11 @@ export default class MailBlockPlugin extends Plugin {
             bodyContent = this.replaceVariables(bodyContent, variables);
             let lines = bodyContent.split("\n");
             lines.forEach(line => {
-                bodyContentEl.createEl("div", {cls: "email-block-body-line", text: line});
+                const elementType = !line ? "br" : "div";
+                bodyContentEl.createEl(elementType, {
+                    cls: elementType === 'div' ? "email-block-body-line" : undefined,
+                    text: line
+                })
             })
         }
     }
