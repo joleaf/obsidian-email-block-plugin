@@ -90,6 +90,7 @@ You can customize the view with the following parameters:
 | showmailto | Show the "mailto" link after the mail body.                            | true/false (Default: true)     |          |
 | variables  | A map of placeholder variables.                                        | YAML Object                    |          | 
 | from       | A from field (only for documentation).                                 | String value                   |          | 
+| date       | The date/time the mail was sent (only for documentation).              | String value                   |          | 
 
 1) The body can be appended after the yaml with a "---" separation
 2) No formatting is supported (only new

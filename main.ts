@@ -9,6 +9,7 @@ interface MailBlockParameters {
     showmailto: boolean | undefined;
     variables: { [name: string]: string | undefined }
     from: string | undefined;
+    date: string | undefined;
 }
 
 export default class MailBlockPlugin extends Plugin {
@@ -30,6 +31,11 @@ export default class MailBlockPlugin extends Plugin {
             try {
                 const rootEl = el.createEl("div", {cls: "email-block email-block-border"});
 
+                if (parameters.date !== undefined) {
+                    rootEl.createEl("div", {cls: "email-block-info", text: "Date:"});
+                    const dateContent = this.replaceVariables(parameters.date, parameters.variables)
+                    rootEl.createEl("div", {cls: "email-block-info-value", text: dateContent});
+                }
                 let fromContent = undefined;
                 if (parameters.from !== undefined) {
                     rootEl.createEl("div", {cls: "email-block-info", text: "From:"});
@@ -84,7 +90,7 @@ export default class MailBlockPlugin extends Plugin {
             yamlString = yamlString.replace("[[", '"[[');
             yamlString = yamlString.replace("]]", ']]"');
         }
-        let extraBody = "";
+        let extraBody = undefined;
         if (yamlString.contains("---\n")) {
             let data = yamlString.split("---\n");
             yamlString = data[0];
