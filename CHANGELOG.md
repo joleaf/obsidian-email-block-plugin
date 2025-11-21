@@ -2,6 +2,12 @@
 
 All changes to this plugin are listed here.
 
+## 1.1.1 (2025-11-21)
+
+### New
+- #18 New new line handling (@Vrum89)
+- #20 New date field (@Sympatron)
+
 ## 1.0.1 (2024-06-18)
 
 ### Fixed
